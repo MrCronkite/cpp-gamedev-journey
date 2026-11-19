@@ -1,0 +1,15 @@
+# Build artifacts
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+*.o
+*.obj
+*.exe
+*.out
+*.dSYM/
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
