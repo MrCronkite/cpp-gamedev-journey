@@ -202,3 +202,53 @@ cmake --build build --target main_hello
 ```
 
 Первая команда обновляет настройки CMake; после последующих изменений только в `.cpp` достаточно двух последних команд.
+
+## Упражнение 4. Статическая библиотека и отладка
+
+`exercises/04-player-project` — отдельный CMake-проект. В `player.hpp` объявлена функция `add_score`, в `player.cpp` находится её реализация, а `main.cpp` её вызывает. Команда `add_library(player STATIC player.cpp)` создаёт статическую библиотеку; `target_link_libraries(player_app PRIVATE player)` подключает её к программе.
+
+### Сборка и запуск
+
+Откройте терминал VS Code в корне `cpp-gamedev-journey`. Если в приглашении отображается `~`, сначала перейдите в папку проекта:
+
+```bash
+cd /Users/admin/Documents/Codex/2026-11-19/cj/cpp-gamedev-journey
+```
+
+Подготовьте Debug-сборку и запустите программу:
+
+```bash
+cmake -S exercises/04-player-project -B exercises/04-player-project/build -DCMAKE_BUILD_TYPE=Debug
+cmake --build exercises/04-player-project/build
+./exercises/04-player-project/build/player_app
+```
+
+Пути в этих командах относительные: они отсчитываются от текущей папки терминала. Команда `pwd` показывает текущую папку. После изменения кода сохраните файл и повторите сборку перед запуском или отладкой.
+
+### Отладка в VS Code
+
+1. Откройте `exercises/04-player-project/main.cpp` и нажмите слева от номера строки `int new_score = add_score(earned_points, score);` — появится красная точка останова (**breakpoint**). При остановке эта строка ещё не выполнена.
+2. В **Run and Debug** создайте `launch.json` и выберите CodeLLDB. При открытой в VS Code корневой папке проекта путь к программе в конфигурации: `${workspaceFolder}/exercises/04-player-project/build/player_app`; `type` — `lldb`, `request` — `launch`.
+3. Нажмите **F5** (на некоторых Mac — **Fn+F5**) и дождитесь остановки. В разделе **Variables → Locals** находятся локальные переменные текущей функции. Раскройте `player`, чтобы увидеть его поля `health` и `score`.
+4. В разделе **Call Stack** отображаются активные вызовы функций. Нажмите **Step Into** на вызове `add_score`, чтобы перейти в неё: стек покажет `add_score` и вызвавшую её `main`, а Locals — параметры функции. Выбирайте кадры стека, чтобы увидеть контекст каждой функции.
+5. **Step Over** выполняет строку без перехода внутрь вызова; **Step Into** входит в функцию; **Step Out** возвращается из функции; **Continue** продолжает выполнение; **Stop** завершает отладку. `new_score` получит значение только после выполнения строки присваивания.
+
+Пример конфигурации `.vscode/launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Отладка player_app",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/exercises/04-player-project/build/player_app",
+      "cwd": "${workspaceFolder}/exercises/04-player-project",
+      "stopOnEntry": false
+    }
+  ]
+}
+```
+
+Папка `.vscode` исключена из Git настройкой `.gitignore`, поэтому локальную конфигурацию потребуется создать отдельно на другом компьютере.
