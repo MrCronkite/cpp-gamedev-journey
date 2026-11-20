@@ -33,3 +33,7 @@ add_executable(score_test exercises/03-cmake/score_test.cpp)
 target_link_libraries(score_test PRIVATE score_library)
 enable_warnings(score_test)
 add_test(NAME score_test COMMAND score_test)
+
+# Отдельный файл для самостоятельных опытов.
+add_executable(main_hello EXCLUDE_FROM_ALL exercises/01-hello-cpp/main_hello.cpp)
+enable_warnings(main_hello)
